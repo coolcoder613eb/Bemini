@@ -1,5 +1,5 @@
 # Bemini
-A Gemini client for Haiku
+A Gemini client for Haiku, written with Haiku-PyAPI
 ## How to run
 First, you must install the dependencies.
 Install `trimgmi` from PyPI:
