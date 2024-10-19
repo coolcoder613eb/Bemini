@@ -128,7 +128,7 @@ class MainWindow(BWindow):
                 run_array = BTextView.AllocRunArray(len(text_runs))
                 run_array.runs = text_runs
                 self.content.SetText(text, run_array)
-                self.window.url_input.SetText(url)
+                self.url_input.SetText(url)
                 self.history.append(url)
                 self.links = links
                 print(links)
