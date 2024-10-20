@@ -19,6 +19,9 @@ PAGE_FETCHED_MSG = BMessage(int32(b"GtPg"))
 for uses in (uses_relative, uses_netloc, uses_params):
     uses.append('gemini')
 
+def tlen(string):
+    return len(string.encode())
+
 
 class BrowserView(BTextView):
     def MouseDown(self, where):
@@ -57,11 +60,11 @@ class MainWindow(BWindow):
         # KLUDGE1: Get around a double free
         self.alerts = []
 
-        self.back_button = BButton("back_button", "Back", BACK_BUTTON_MSG)
+        self.back_button = BButton("back_button", "Back", BMessage(BACK_BUTTON_MSG))
 
-        self.go_button = BButton("go_button", "Go!", GO_BUTTON_MSG)
+        self.go_button = BButton("go_button", "Go!", BMessage(GO_BUTTON_MSG))
 
-        self.url_input = BTextControl("", "gemini://", GO_BUTTON_MSG)
+        self.url_input = BTextControl("", "gemini://", BMessage(GO_BUTTON_MSG))
 
         self.setup_fonts()
 
@@ -70,6 +73,8 @@ class MainWindow(BWindow):
         self.content_scroll = BScrollView(
             "content_scroll", self.content, 0, False, True, B_NO_BORDER
         )
+        self.content.SetHighUIColor(B_DOCUMENT_TEXT_COLOR)
+        self.content.SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR)
 
         self.home_page()
 
@@ -184,14 +189,15 @@ class MainWindow(BWindow):
         for line in document.emit_line_objects():
             run = text_run()
             run.offset = index
+            run.color = ui_color(B_DOCUMENT_TEXT_COLOR)
             if line.type == LineType.BLANK:
                 t = "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.regular_font
             elif line.type == LineType.REGULAR:
                 t = line.text + "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.regular_font
             elif line.type == LineType.LINK:
@@ -200,44 +206,43 @@ class MainWindow(BWindow):
                     t = f"    {line.extra}\n"
                 else:
                     t = f"    {line.text}\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
-                links.append((range(len(final_text) - (len(t) - 4), len(final_text) - 1),line.extra))
+                links.append((range(tlen(final_text) - (tlen(t) - 4), tlen(final_text) - 1),line.extra))
                 run.font = self.link_font
-                color = rgb_color()
-                color.set_to(0, 120, 140)
-                run.color = color
+                run.color.set_to(0, 120, 140)
             elif line.type == LineType.HEADING1:
                 t = line.text + "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.heading1_font
             elif line.type == LineType.HEADING2:
                 t = line.text + "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.heading2_font
             elif line.type == LineType.HEADING3:
                 t = line.text + "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.heading3_font
             elif line.type == LineType.LIST_ITEM:
                 t = "◦ " + line.text + "\n"
-                index += len(t) + 2
+                index += tlen(t) + 2
                 final_text += t
                 run.font = self.regular_font
             elif line.type == LineType.QUOTE:
                 t = "▎ " + line.text + "\n"
-                index += len(t) + 2
+                index += tlen(t) + 2
                 final_text += t
                 run.font = self.regular_font
-                color = rgb_color()
-                color.set_to(60, 60, 60)
-                run.color = color
+                if ui_color(B_DOCUMENT_TEXT_COLOR).IsDark():
+                    run.color.set_to(60,60,60)
+                else:
+                    run.color.set_to(195,195,195)
             elif line.type == LineType.PREFORMAT_LINE:
                 t = line.text + "\n"
-                index += len(t)
+                index += tlen(t)
                 final_text += t
                 run.font = self.mono_font
             text_runs.append(run)
