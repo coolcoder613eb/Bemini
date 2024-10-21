@@ -1,3 +1,4 @@
+#!/bin/python3
 """
 To run, install Haiku-PyAPI, trimgmi and gusmobile
 pip install trimgmi git+https://git.sr.ht/~rwa/gusmobile
