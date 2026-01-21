@@ -35,6 +35,7 @@ class BrowserView(BTextView):
 
 
 class MainWindow(BWindow):
+    events={}
     def __init__(self):
         BWindow.__init__(
             self,
@@ -248,6 +249,13 @@ class MainWindow(BWindow):
                 run.font = self.mono_font
             text_runs.append(run)
         return text_runs, final_text, links
+    def MessageReceived(self, msg):
+        if msg.what in self.events:
+            self.events[msg.what](msg)
+        elif msg in self.events:
+            self.events[msg](msg)
+        else:
+            BWindow.MessageReceived(self, msg)
 
 
 class Bemini(BApplication):
